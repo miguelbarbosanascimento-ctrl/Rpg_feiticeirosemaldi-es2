@@ -1,0 +1,2 @@
+- [Clerk version compatibility](clerk-versions.md) — @clerk/react@6.x + @clerk/express@2.x both require @clerk/shared@^4.x; add @clerk/* to minimumReleaseAgeExclude in pnpm-workspace.yaml
+- [Clerk publishableKeyFromHost import](clerk-import.md) — use @clerk/react/internal on frontend; NOT @clerk/shared/keys directly (different @clerk/shared version resolves to server package)

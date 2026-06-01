@@ -3,13 +3,29 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Feiticeiros e Maldições – RPG Character Sheet API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: characters
+    description: Character sheet operations
+  - name: techniques
+    description: Cursed technique library
+  - name: aptitudes
+    description: Cursed aptitude reference
+  - name: summary
+    description: Dashboard and summary data
+  - name: shikigamis
+    description: Shikigami / invocation creator
+  - name: domains
+    description: Domain expansion creator
+  - name: bosses
+    description: Boss / enemy / cursed creature creator (master tools)
+  - name: campaigns
+    description: Campaign management (master tools)
 paths:
   /healthz:
     get:
@@ -24,6 +40,504 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /characters:
+    get:
+      operationId: listCharacters
+      tags: [characters]
+      summary: List all characters
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: origin
+          in: query
+          schema:
+            type: string
+        - name: specialization
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of characters
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CharacterSummary"
+    post:
+      operationId: createCharacter
+      tags: [characters]
+      summary: Create a new character
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CharacterInput"
+      responses:
+        "201":
+          description: Character created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Character"
+
+  /characters/{id}:
+    get:
+      operationId: getCharacter
+      tags: [characters]
+      summary: Get a character sheet
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Character sheet
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Character"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateCharacter
+      tags: [characters]
+      summary: Update a character
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CharacterUpdate"
+      responses:
+        "200":
+          description: Updated character
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Character"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteCharacter
+      tags: [characters]
+      summary: Delete a character
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /techniques:
+    get:
+      operationId: listTechniques
+      tags: [techniques]
+      summary: List available cursed techniques from the books
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: category
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of techniques
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Technique"
+    post:
+      operationId: createTechnique
+      tags: [techniques]
+      summary: Create a custom technique
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TechniqueInput"
+      responses:
+        "201":
+          description: Technique created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Technique"
+
+  /techniques/{id}:
+    get:
+      operationId: getTechnique
+      tags: [techniques]
+      summary: Get technique details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Technique details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Technique"
+        "404":
+          description: Not found
+
+  /aptitudes:
+    get:
+      operationId: listAptitudes
+      tags: [aptitudes]
+      summary: List available cursed aptitudes
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of aptitudes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Aptitude"
+
+  /shikigamis:
+    get:
+      operationId: listShikigamis
+      tags: [shikigamis]
+      summary: List shikigamis
+      responses:
+        "200":
+          description: List
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Shikigami"
+    post:
+      operationId: createShikigami
+      tags: [shikigamis]
+      summary: Create shikigami
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ShikigamiInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shikigami"
+
+  /shikigamis/{id}:
+    delete:
+      operationId: deleteShikigami
+      tags: [shikigamis]
+      summary: Delete shikigami
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /domains:
+    get:
+      operationId: listDomains
+      tags: [domains]
+      summary: List domain expansions
+      responses:
+        "200":
+          description: List
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Domain"
+    post:
+      operationId: createDomain
+      tags: [domains]
+      summary: Create domain expansion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DomainInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Domain"
+
+  /domains/{id}:
+    delete:
+      operationId: deleteDomain
+      tags: [domains]
+      summary: Delete domain
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /bosses:
+    get:
+      operationId: listBosses
+      tags: [bosses]
+      summary: List bosses
+      responses:
+        "200":
+          description: List
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BossSummary"
+    post:
+      operationId: createBoss
+      tags: [bosses]
+      summary: Create boss
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BossInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Boss"
+
+  /bosses/{id}:
+    get:
+      operationId: getBoss
+      tags: [bosses]
+      summary: Get boss
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Boss
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Boss"
+    patch:
+      operationId: updateBoss
+      tags: [bosses]
+      summary: Update boss
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BossUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Boss"
+    delete:
+      operationId: deleteBoss
+      tags: [bosses]
+      summary: Delete boss
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /campaigns:
+    get:
+      operationId: listCampaigns
+      tags: [campaigns]
+      summary: List campaigns
+      responses:
+        "200":
+          description: List
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CampaignSummary"
+    post:
+      operationId: createCampaign
+      tags: [campaigns]
+      summary: Create campaign
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CampaignInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Campaign"
+
+  /campaigns/{id}:
+    get:
+      operationId: getCampaign
+      tags: [campaigns]
+      summary: Get campaign
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Campaign
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Campaign"
+    patch:
+      operationId: updateCampaign
+      tags: [campaigns]
+      summary: Update campaign
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CampaignUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Campaign"
+    delete:
+      operationId: deleteCampaign
+      tags: [campaigns]
+      summary: Delete campaign
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [summary]
+      summary: Get dashboard summary stats
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+
+  /summary/origins:
+    get:
+      operationId: getOriginBreakdown
+      tags: [summary]
+      summary: Character count by origin
+      responses:
+        "200":
+          description: Origin breakdown
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OriginCount"
+
+  /summary/specializations:
+    get:
+      operationId: getSpecializationBreakdown
+      tags: [summary]
+      summary: Character count by specialization
+      responses:
+        "200":
+          description: Specialization breakdown
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SpecCount"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +548,730 @@ components:
       required:
         - status
 
+    CharacterSummary:
+      type: object
+      required: [id, name, level, origin, specialization, grade, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        level:
+          type: integer
+        origin:
+          type: string
+        specialization:
+          type: string
+        grade:
+          type: string
+        technique:
+          type: ["string", "null"]
+        hp:
+          type: integer
+        maxHp:
+          type: integer
+        energy:
+          type: integer
+        maxEnergy:
+          type: integer
+        armorClass:
+          type: integer
+        photoUrl:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+
+    Character:
+      type: object
+      required:
+        - id
+        - name
+        - level
+        - experience
+        - origin
+        - specialization
+        - grade
+        - strength
+        - dexterity
+        - constitution
+        - intelligence
+        - wisdom
+        - charisma
+        - hp
+        - maxHp
+        - energy
+        - maxEnergy
+        - armorClass
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        level:
+          type: integer
+        experience:
+          type: integer
+        origin:
+          type: string
+        clanHeritage:
+          type: ["string", "null"]
+        specialization:
+          type: string
+        grade:
+          type: string
+        backstory:
+          type: ["string", "null"]
+        personality:
+          type: ["string", "null"]
+        technique:
+          type: ["string", "null"]
+        technique_description:
+          type: ["string", "null"]
+        strength:
+          type: integer
+        dexterity:
+          type: integer
+        constitution:
+          type: integer
+        intelligence:
+          type: integer
+        wisdom:
+          type: integer
+        charisma:
+          type: integer
+        hp:
+          type: integer
+        maxHp:
+          type: integer
+        energy:
+          type: integer
+        maxEnergy:
+          type: integer
+        armorClass:
+          type: integer
+        masteryBonus:
+          type: integer
+        skills:
+          type: ["string", "null"]
+        equipment:
+          type: ["string", "null"]
+        aptitudes:
+          type: ["string", "null"]
+        abilities:
+          type: ["string", "null"]
+        customStats:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+        photoUrl:
+          type: ["string", "null"]
+        age:
+          type: ["string", "null"]
+        height:
+          type: ["string", "null"]
+        weight:
+          type: ["string", "null"]
+        school:
+          type: ["string", "null"]
+        occupation:
+          type: ["string", "null"]
+        appearance:
+          type: ["string", "null"]
+        ideals:
+          type: ["string", "null"]
+        bonds:
+          type: ["string", "null"]
+        complications:
+          type: ["string", "null"]
+        innateDomain:
+          type: ["string", "null"]
+        soulIntegrity:
+          type: integer
+        maxSoulIntegrity:
+          type: integer
+        attention:
+          type: integer
+        movement:
+          type: string
+        hitDice:
+          type: string
+        resistances:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CharacterInput:
+      type: object
+      required:
+        - name
+        - origin
+        - specialization
+      properties:
+        name:
+          type: string
+          minLength: 1
+        level:
+          type: integer
+          default: 1
+        origin:
+          type: string
+        clanHeritage:
+          type: string
+        specialization:
+          type: string
+        grade:
+          type: string
+          default: "4° Grau"
+        backstory:
+          type: string
+        personality:
+          type: string
+        technique:
+          type: string
+        technique_description:
+          type: string
+        strength:
+          type: integer
+          default: 1
+        dexterity:
+          type: integer
+          default: 1
+        constitution:
+          type: integer
+          default: 1
+        intelligence:
+          type: integer
+          default: 1
+        wisdom:
+          type: integer
+          default: 1
+        charisma:
+          type: integer
+          default: 1
+        hp:
+          type: integer
+        maxHp:
+          type: integer
+        energy:
+          type: integer
+        maxEnergy:
+          type: integer
+        armorClass:
+          type: integer
+          default: 10
+        skills:
+          type: string
+        equipment:
+          type: string
+        aptitudes:
+          type: string
+        abilities:
+          type: string
+        customStats:
+          type: string
+        notes:
+          type: string
+        photoUrl:
+          type: string
+        age:
+          type: string
+        height:
+          type: string
+        weight:
+          type: string
+        school:
+          type: string
+        occupation:
+          type: string
+        appearance:
+          type: string
+        ideals:
+          type: string
+        bonds:
+          type: string
+        complications:
+          type: string
+        innateDomain:
+          type: string
+        soulIntegrity:
+          type: integer
+        maxSoulIntegrity:
+          type: integer
+        attention:
+          type: integer
+        movement:
+          type: string
+        hitDice:
+          type: string
+        resistances:
+          type: string
+
+    CharacterUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        level:
+          type: integer
+        experience:
+          type: integer
+        origin:
+          type: string
+        clanHeritage:
+          type: string
+        specialization:
+          type: string
+        grade:
+          type: string
+        backstory:
+          type: string
+        personality:
+          type: string
+        technique:
+          type: string
+        technique_description:
+          type: string
+        strength:
+          type: integer
+        dexterity:
+          type: integer
+        constitution:
+          type: integer
+        intelligence:
+          type: integer
+        wisdom:
+          type: integer
+        charisma:
+          type: integer
+        hp:
+          type: integer
+        maxHp:
+          type: integer
+        energy:
+          type: integer
+        maxEnergy:
+          type: integer
+        armorClass:
+          type: integer
+        skills:
+          type: string
+        equipment:
+          type: string
+        aptitudes:
+          type: string
+        abilities:
+          type: string
+        customStats:
+          type: string
+        notes:
+          type: string
+        photoUrl:
+          type: string
+        age:
+          type: string
+        height:
+          type: string
+        weight:
+          type: string
+        school:
+          type: string
+        occupation:
+          type: string
+        appearance:
+          type: string
+        ideals:
+          type: string
+        bonds:
+          type: string
+        complications:
+          type: string
+        innateDomain:
+          type: string
+        soulIntegrity:
+          type: integer
+        maxSoulIntegrity:
+          type: integer
+        attention:
+          type: integer
+        movement:
+          type: string
+        hitDice:
+          type: string
+        resistances:
+          type: string
+
+    Technique:
+      type: object
+      required: [id, name, category, description, isCustom]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        category:
+          type: string
+        description:
+          type: string
+        source:
+          type: ["string", "null"]
+        abilities:
+          type: ["string", "null"]
+        isCustom:
+          type: boolean
+
+    TechniqueInput:
+      type: object
+      required: [name, category, description]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        category:
+          type: string
+        description:
+          type: string
+        source:
+          type: string
+        abilities:
+          type: string
+
+    Aptitude:
+      type: object
+      required: [id, name, category, level, description]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        category:
+          type: string
+        level:
+          type: integer
+        description:
+          type: string
+        prerequisite:
+          type: ["string", "null"]
+
+    DashboardSummary:
+      type: object
+      required: [totalCharacters, totalTechniques, averageLevel, highestLevel]
+      properties:
+        totalCharacters:
+          type: integer
+        totalTechniques:
+          type: integer
+        averageLevel:
+          type: number
+        highestLevel:
+          type: integer
+        mostCommonOrigin:
+          type: ["string", "null"]
+        mostCommonSpecialization:
+          type: ["string", "null"]
+
+    OriginCount:
+      type: object
+      required: [origin, count]
+      properties:
+        origin:
+          type: string
+        count:
+          type: integer
+
+    Shikigami:
+      type: object
+      required: [id, name, type, rank, hp, energy, createdAt]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        appearance: { type: ["string", "null"] }
+        type: { type: string }
+        rank: { type: string }
+        hp: { type: integer }
+        energy: { type: integer }
+        abilities: { type: ["string", "null"] }
+        techniques: { type: ["string", "null"] }
+        relationship: { type: ["string", "null"] }
+        ownerCharacterId: { type: ["integer", "null"] }
+        createdAt: { type: string, format: date-time }
+
+    ShikigamiInput:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string, minLength: 1 }
+        appearance: { type: string }
+        type: { type: string }
+        rank: { type: string }
+        hp: { type: integer }
+        energy: { type: integer }
+        abilities: { type: string }
+        techniques: { type: string }
+        relationship: { type: string }
+        ownerCharacterId: { type: integer }
+
+    Domain:
+      type: object
+      required: [id, name, cost, createdAt]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        appearance: { type: ["string", "null"] }
+        barrier: { type: ["string", "null"] }
+        guaranteedEffect: { type: ["string", "null"] }
+        conditions: { type: ["string", "null"] }
+        activationPhrase: { type: ["string", "null"] }
+        buffs: { type: ["string", "null"] }
+        debuffs: { type: ["string", "null"] }
+        cost: { type: integer }
+        ownerCharacterId: { type: ["integer", "null"] }
+        createdAt: { type: string, format: date-time }
+
+    DomainInput:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string, minLength: 1 }
+        appearance: { type: string }
+        barrier: { type: string }
+        guaranteedEffect: { type: string }
+        conditions: { type: string }
+        activationPhrase: { type: string }
+        buffs: { type: string }
+        debuffs: { type: string }
+        cost: { type: integer }
+        ownerCharacterId: { type: integer }
+
+    BossSummary:
+      type: object
+      required: [id, name, vd, category, size, grade, hp, maxHp, createdAt]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        photoUrl: { type: ["string", "null"] }
+        vd: { type: integer }
+        category: { type: string }
+        size: { type: string }
+        grade: { type: string }
+        hp: { type: integer }
+        maxHp: { type: integer }
+        innateTechnique: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+
+    Boss:
+      type: object
+      required:
+        - id
+        - name
+        - vd
+        - category
+        - size
+        - grade
+        - strength
+        - dexterity
+        - constitution
+        - intelligence
+        - wisdom
+        - charisma
+        - hp
+        - maxHp
+        - energy
+        - maxEnergy
+        - armorClass
+        - attention
+        - movement
+        - hitDice
+        - createdAt
+        - updatedAt
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        photoUrl: { type: ["string", "null"] }
+        vd: { type: integer }
+        category: { type: string }
+        size: { type: string }
+        grade: { type: string }
+        domain: { type: ["string", "null"] }
+        description: { type: ["string", "null"] }
+        appearance: { type: ["string", "null"] }
+        strength: { type: integer }
+        dexterity: { type: integer }
+        constitution: { type: integer }
+        intelligence: { type: integer }
+        wisdom: { type: integer }
+        charisma: { type: integer }
+        hp: { type: integer }
+        maxHp: { type: integer }
+        energy: { type: integer }
+        maxEnergy: { type: integer }
+        armorClass: { type: integer }
+        attention: { type: integer }
+        movement: { type: string }
+        hitDice: { type: string }
+        abilities: { type: ["string", "null"] }
+        innateTechnique: { type: ["string", "null"] }
+        techniqueDescription: { type: ["string", "null"] }
+        weaknesses: { type: ["string", "null"] }
+        resistances: { type: ["string", "null"] }
+        loot: { type: ["string", "null"] }
+        notes: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    BossInput:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string, minLength: 1 }
+        photoUrl: { type: string }
+        vd: { type: integer, default: 10 }
+        category: { type: string, default: "Maldição" }
+        size: { type: string, default: "Médio" }
+        grade: { type: string, default: "3° Grau" }
+        domain: { type: string }
+        description: { type: string }
+        appearance: { type: string }
+        strength: { type: integer }
+        dexterity: { type: integer }
+        constitution: { type: integer }
+        intelligence: { type: integer }
+        wisdom: { type: integer }
+        charisma: { type: integer }
+        hp: { type: integer }
+        maxHp: { type: integer }
+        energy: { type: integer }
+        maxEnergy: { type: integer }
+        armorClass: { type: integer }
+        attention: { type: integer }
+        movement: { type: string }
+        hitDice: { type: string }
+        abilities: { type: string }
+        innateTechnique: { type: string }
+        techniqueDescription: { type: string }
+        weaknesses: { type: string }
+        resistances: { type: string }
+        loot: { type: string }
+        notes: { type: string }
+
+    BossUpdate:
+      type: object
+      properties:
+        name: { type: string, minLength: 1 }
+        photoUrl: { type: string }
+        vd: { type: integer }
+        category: { type: string }
+        size: { type: string }
+        grade: { type: string }
+        domain: { type: string }
+        description: { type: string }
+        appearance: { type: string }
+        strength: { type: integer }
+        dexterity: { type: integer }
+        constitution: { type: integer }
+        intelligence: { type: integer }
+        wisdom: { type: integer }
+        charisma: { type: integer }
+        hp: { type: integer }
+        maxHp: { type: integer }
+        energy: { type: integer }
+        maxEnergy: { type: integer }
+        armorClass: { type: integer }
+        attention: { type: integer }
+        movement: { type: string }
+        hitDice: { type: string }
+        abilities: { type: string }
+        innateTechnique: { type: string }
+        techniqueDescription: { type: string }
+        weaknesses: { type: string }
+        resistances: { type: string }
+        loot: { type: string }
+        notes: { type: string }
+
+    CampaignSummary:
+      type: object
+      required: [id, name, status, createdAt]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        coverUrl: { type: ["string", "null"] }
+        status: { type: string }
+        currentArc: { type: ["string", "null"] }
+        partyName: { type: ["string", "null"] }
+        synopsis: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+
+    Campaign:
+      type: object
+      required: [id, name, status, createdAt, updatedAt]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        coverUrl: { type: ["string", "null"] }
+        synopsis: { type: ["string", "null"] }
+        setting: { type: ["string", "null"] }
+        status: { type: string }
+        currentArc: { type: ["string", "null"] }
+        nextSession: { type: ["string", "null"] }
+        partyName: { type: ["string", "null"] }
+        playerCharacterIds: { type: ["string", "null"] }
+        bossIds: { type: ["string", "null"] }
+        sessionLog: { type: ["string", "null"] }
+        npcs: { type: ["string", "null"] }
+        locations: { type: ["string", "null"] }
+        notes: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    CampaignInput:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string, minLength: 1 }
+        coverUrl: { type: string }
+        synopsis: { type: string }
+        setting: { type: string }
+        status: { type: string, default: "Em andamento" }
+        currentArc: { type: string }
+        nextSession: { type: string }
+        partyName: { type: string }
+        playerCharacterIds: { type: string }
+        bossIds: { type: string }
+        sessionLog: { type: string }
+        npcs: { type: string }
+        locations: { type: string }
+        notes: { type: string }
+
+    CampaignUpdate:
+      type: object
+      properties:
+        name: { type: string, minLength: 1 }
+        coverUrl: { type: string }
+        synopsis: { type: string }
+        setting: { type: string }
+        status: { type: string }
+        currentArc: { type: string }
+        nextSession: { type: string }
+        partyName: { type: string }
+        playerCharacterIds: { type: string }
+        bossIds: { type: string }
+        sessionLog: { type: string }
+        npcs: { type: string }
+        locations: { type: string }
+        notes: { type: string }
+
+    SpecCount:
+      type: object
+      required: [specialization, count]
+      properties:
+        specialization:
+          type: string
+        count:
+          type: integer

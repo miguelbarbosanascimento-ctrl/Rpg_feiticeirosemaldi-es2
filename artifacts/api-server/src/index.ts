@@ -1,5 +1,6 @@
 import app from "./app";
 import { logger } from "./lib/logger";
+import { autoMigrate } from "@workspace/db";
 
 const rawPort = process.env["PORT"];
 
@@ -14,6 +15,14 @@ const port = Number(rawPort);
 if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
+
+autoMigrate()
+  .then(() => {
+    logger.info("Database tables verified / created");
+  })
+  .catch((err) => {
+    logger.warn({ err }, "Auto-migrate warning (non-fatal)");
+  });
 
 app.listen(port, (err) => {
   if (err) {
